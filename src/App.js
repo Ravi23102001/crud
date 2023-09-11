@@ -15,6 +15,7 @@ import { format } from "date-fns";
 import Podetail from "./Podetail";
 import Footer from "./Footer";
 import axios from "axios";
+import Editpost from "./Editpost";
 
 function App() {
   const navigate = useNavigate();
@@ -25,6 +26,8 @@ function App() {
   const [postTitle, setPostTitle] = useState("");
   const [postBody, setPostBody] = useState("");
   const [filters, setFilters] = useState([]);
+  const [editTitle, setEditTitle]=useState()
+  const [editBody, setEditBody]=useState("gg")
   const baseURL = "http://localhost:3500/postsList";
   // console.log(postsList, "ma");
 
@@ -48,6 +51,7 @@ function App() {
         posts.title.toLowerCase().includes(search.toLowerCase()) ||
         posts.body.toLowerCase().includes(search.toLowerCase())
     );
+  
     setFilters(filterResult.reverse());
   }, [posts, search]);
 
@@ -57,12 +61,32 @@ function App() {
         const response = await axios.get(baseURL);
         // console.log(response)
         setPosts(response.data);
+        
       } catch (error) {
         console.log(error);
       }
     };
+
     axiosFetch();
-  }, []);
+  }, [posts]);
+
+  const handleUpdate= async(id)=>{
+    navigate("/")
+    // const up=posts.find((post)=>post.id==id)
+    const datetime = format(new Date(), "MMM,dd,yyyy pp");
+    const newPost = { id, title: editTitle, datetime, body: editBody };
+    console.log(newPost,"HAI")
+    try {
+      const response=axios.put(`${baseURL}/${id}`, newPost)
+// setPosts(posts.map((post)=>post.id===id ? newPost:post))
+      
+    } catch (error) {
+      
+    }
+    
+    
+
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,9 +96,9 @@ function App() {
     // console.log(datetime)
 
     const fullPost = [...posts, newPost];
-    console.log(fullPost);
+    console.log(fullPost,"ff");
 
-    localStorage.setItem("posts", JSON.stringify(fullPost));
+    // localStorage.setItem("posts", JSON.stringify(fullPost));
     setPosts(fullPost);
     console.log(posts, "dd");
     try {
@@ -96,6 +120,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home posts={filters} />} />
         <Route path="/post">
+
           <Route
             index
             element={
@@ -110,12 +135,21 @@ function App() {
           />
           <Route
             path=":id"
-            element={<Podetail posts={posts} handleDelete={handleDelete} />}
+            element={<Podetail posts={posts} handleDelete={handleDelete} handleUpdate={handleUpdate}/>}
           />
+    
+          
         </Route>
+        <Route path="/editpost/:id" element={<Editpost posts={posts} editTitle={editTitle}
+                editBody={editBody}
+                setEditBody={setEditBody}
+                setEditTitle={setEditTitle}
+                handleUpdate={handleUpdate} />}/>
         <Route path="/about/:id" element={<About />} /> //path about/ entha path
         ahh irunthalum about component la route agum
         <Route path="*" element={<Missing />} />
+          
+        
       </Routes>
     </div>
   );

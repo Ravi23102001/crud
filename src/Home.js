@@ -2,7 +2,7 @@ import React from "react";
 import PostDel from "./PostDel";
 
 function Home({ posts }) {
-  console.log(posts, "po");
+  // console.log(posts, "po");
   return (
     <div className="home">
       {posts.length ? (
